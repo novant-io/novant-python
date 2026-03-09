@@ -6,8 +6,28 @@ build-backend = "setuptools.build_meta"
 name = "novant"
 version = "0.1.0"
 description = "Python SDK for the Novant API"
+readme = "README.md"
 license = "MIT"
 requires-python = ">=3.10"
+authors = [
+    {name = "Novant", email = "support@novant.io"},
+]
+keywords = ["novant", "novant-sdk", "iot", "building-automation", "sdk"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+
+[project.urls]
+Homepage = "https://novant.io"
+Documentation = "https://docs.novant.io/api"
+Repository = "https://github.com/novant-io/novant-python"
 
 [project.optional-dependencies]
 pandas = ["pandas>=1.5"]
