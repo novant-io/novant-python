@@ -102,6 +102,20 @@ class AssetList:
     currency: str
     assets: list[Asset]
 
+    def asset(self, id):
+        """Lookup an asset by id.
+
+        Args:
+            id: asset id string
+
+        Returns:
+            Asset or None if not found
+        """
+        for a in self.assets:
+            if a.id == id:
+                return a
+        return None
+
     @classmethod
     def _from_dict(cls, d):
         return cls(
@@ -138,6 +152,31 @@ class Space:
             ontology=Ontology._from_dict(d.get("ontology")),
         )
 
+@dataclass
+class SpaceList:
+    """Response from the spaces endpoint."""
+    spaces: list[Space]
+
+    def space(self, id):
+        """Lookup a space by id.
+
+        Args:
+            id: space id string
+
+        Returns:
+            Space or None if not found
+        """
+        for s in self.spaces:
+            if s.id == id:
+                return s
+        return None
+
+    @classmethod
+    def _from_dict(cls, d):
+        return cls(
+            spaces=[Space._from_dict(s) for s in d["spaces"]],
+        )
+
 #############################################################################
 # Zone
 #############################################################################
@@ -159,6 +198,31 @@ class Zone:
             type=d["type"],
             fed_by_asset_ids=d.get("fed_by_asset_ids", []),
             feeds_space_ids=d.get("feeds_space_ids", []),
+        )
+
+@dataclass
+class ZoneList:
+    """Response from the zones endpoint."""
+    zones: list[Zone]
+
+    def zone(self, id):
+        """Lookup a zone by id.
+
+        Args:
+            id: zone id string
+
+        Returns:
+            Zone or None if not found
+        """
+        for z in self.zones:
+            if z.id == id:
+                return z
+        return None
+
+    @classmethod
+    def _from_dict(cls, d):
+        return cls(
+            zones=[Zone._from_dict(z) for z in d["zones"]],
         )
 
 #############################################################################
@@ -192,6 +256,31 @@ class Source:
             enabled=d.get("enabled", False),
             bound=d.get("bound", False),
             parent_asset_id=d.get("parent_asset_id"),
+        )
+
+@dataclass
+class SourceList:
+    """Response from the sources endpoint."""
+    sources: list[Source]
+
+    def source(self, id):
+        """Lookup a source by id.
+
+        Args:
+            id: source id string
+
+        Returns:
+            Source or None if not found
+        """
+        for s in self.sources:
+            if s.id == id:
+                return s
+        return None
+
+    @classmethod
+    def _from_dict(cls, d):
+        return cls(
+            sources=[Source._from_dict(s) for s in d["sources"]],
         )
 
 #############################################################################

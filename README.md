@@ -83,9 +83,9 @@ Create a new client with your API key.
 ### Assets, Spaces, Zones, Sources
 
 - `assets(asset_ids=None)` → `AssetList` — List assets
-- `spaces(space_ids=None)` → `list[Space]` — List spaces
-- `zones(zone_ids=None)` → `list[Zone]` — List zones
-- `sources(source_ids=None, bound_only=False)` → `list[Source]` — List sources
+- `spaces(space_ids=None)` → `SpaceList` — List spaces
+- `zones(zone_ids=None)` → `ZoneList` — List zones
+- `sources(source_ids=None, bound_only=False)` → `SourceList` — List sources
 
 ### Points & Values
 

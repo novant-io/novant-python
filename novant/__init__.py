@@ -8,7 +8,7 @@
 from .client import NovantClient
 from .err import NovantErr
 from .models import (
-    Project, Asset, AssetList, Space, Zone, Source,
-    Point, PointList, EnumState, Ontology,
+    Project, Asset, AssetList, Space, SpaceList, Zone, ZoneList,
+    Source, SourceList, Point, PointList, EnumState, Ontology,
     PointValue, ValueList, TrendRow, TrendData, WriteResult,
 )

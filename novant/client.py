@@ -15,7 +15,7 @@ import gzip
 
 from .err import NovantErr
 from .models import (
-    Project, AssetList, Space, Zone, Source,
+    Project, AssetList, SpaceList, ZoneList, SourceList,
     PointList, ValueList, TrendData, WriteResult,
 )
 
@@ -76,13 +76,12 @@ class NovantClient:
             space_ids: optional list of space id strings to filter
 
         Returns:
-            list[Space]
+            SpaceList
         """
         params = {}
         if space_ids is not None:
             params["space_ids"] = ",".join(space_ids)
-        data = self._get("/spaces", params)
-        return [Space._from_dict(s) for s in data["spaces"]]
+        return SpaceList._from_dict(self._get("/spaces", params))
 
     ######
     # Zones
@@ -95,13 +94,12 @@ class NovantClient:
             zone_ids: optional list of zone id strings to filter
 
         Returns:
-            list[Zone]
+            ZoneList
         """
         params = {}
         if zone_ids is not None:
             params["zone_ids"] = ",".join(zone_ids)
-        data = self._get("/zones", params)
-        return [Zone._from_dict(z) for z in data["zones"]]
+        return ZoneList._from_dict(self._get("/zones", params))
 
     ######
     # Sources
@@ -115,15 +113,14 @@ class NovantClient:
             bound_only: if True only return bound sources
 
         Returns:
-            list[Source]
+            SourceList
         """
         params = {}
         if source_ids is not None:
             params["source_ids"] = ",".join(source_ids)
         if bound_only:
             params["bound_only"] = "true"
-        data = self._get("/sources", params)
-        return [Source._from_dict(s) for s in data["sources"]]
+        return SourceList._from_dict(self._get("/sources", params))
 
     ######
     # Points
