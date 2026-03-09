@@ -29,21 +29,15 @@ print(proj.city)        # "Richmond, VA"
 print(proj.tz)          # "New_York"
 
 # List assets
-result = client.assets()
-for asset in result.assets:
+for asset in client.assets():
     print(asset.name, asset.type)
 
 # Read current values
-result = client.values(source_id="s.2")
-for v in result.values:
+for v in client.values(source_id="s.2"):
     print(v.id, v.val, v.status)
 
 # Get trend data
-trends = client.trends(
-    point_ids=["s.2.4", "s.2.5"],
-    date="2026-03-09"
-)
-for row in trends.trends:
+for row in client.trends(point_ids=["s.2.4", "s.2.5"], date="2026-03-09"):
     print(row.ts, row.values)
 ```
 

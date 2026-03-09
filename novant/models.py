@@ -102,6 +102,12 @@ class AssetList:
     currency: str
     assets: list[Asset]
 
+    def __iter__(self):
+        return iter(self.assets)
+
+    def __len__(self):
+        return len(self.assets)
+
     def asset(self, id):
         """Lookup an asset by id.
 
@@ -157,6 +163,12 @@ class SpaceList:
     """Response from the spaces endpoint."""
     spaces: list[Space]
 
+    def __iter__(self):
+        return iter(self.spaces)
+
+    def __len__(self):
+        return len(self.spaces)
+
     def space(self, id):
         """Lookup a space by id.
 
@@ -206,6 +218,12 @@ class Zone:
 class ZoneList:
     """Response from the zones endpoint."""
     zones: list[Zone]
+
+    def __iter__(self):
+        return iter(self.zones)
+
+    def __len__(self):
+        return len(self.zones)
 
     def zone(self, id):
         """Lookup a zone by id.
@@ -264,6 +282,12 @@ class Source:
 class SourceList:
     """Response from the sources endpoint."""
     sources: list[Source]
+
+    def __iter__(self):
+        return iter(self.sources)
+
+    def __len__(self):
+        return len(self.sources)
 
     def source(self, id):
         """Lookup a source by id.
@@ -336,6 +360,12 @@ class PointList:
     source_enabled: bool
     points: list[Point]
 
+    def __iter__(self):
+        return iter(self.points)
+
+    def __len__(self):
+        return len(self.points)
+
     def point(self, id):
         """Lookup a point by id.
 
@@ -380,6 +410,12 @@ class ValueList:
     """Response from the values endpoint."""
     source_id: str
     values: list[PointValue]
+
+    def __iter__(self):
+        return iter(self.values)
+
+    def __len__(self):
+        return len(self.values)
 
     def point(self, id):
         """Lookup a point value by id.
@@ -448,6 +484,12 @@ class TrendData:
     aggregate: str
     point_ids: list[str]
     trends: list[TrendRow]
+
+    def __iter__(self):
+        return iter(self.trends)
+
+    def __len__(self):
+        return len(self.trends)
 
     def to_dataframe(self):
         """Convert to a pandas DataFrame with DatetimeIndex.
