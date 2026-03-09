@@ -276,6 +276,20 @@ class ValueList:
     source_id: str
     values: list[PointValue]
 
+    def point(self, id):
+        """Lookup a point value by id.
+
+        Args:
+            id: point id string
+
+        Returns:
+            PointValue or None if not found
+        """
+        for v in self.values:
+            if v.id == id:
+                return v
+        return None
+
     def to_dataframe(self):
         """Convert to a pandas DataFrame.
 

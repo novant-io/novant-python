@@ -25,7 +25,7 @@ client = NovantClient(api_key="ak_xxx")
 
 # Get project info
 proj = client.project()
-print(proj.city)        # "New York"
+print(proj.city)        # "Richmond, VA"
 print(proj.tz)          # "New_York"
 
 # List assets
@@ -127,7 +127,3 @@ except NovantErr as e:
     print(e.code)     # HTTP status code
     print(e.message)  # Error message
 ```
-
-## License
-
-MIT License. Copyright (c) 2026, Novant LLC.
