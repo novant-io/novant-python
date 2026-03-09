@@ -26,14 +26,18 @@ from .models import (
 class NovantClient:
     """Client for the Novant REST API."""
 
-    def __init__(self, api_key):
+    VERSION = "0.1.0"
+
+    def __init__(self, api_key, timeout=30):
         """Create a new NovantClient instance.
 
         Args:
             api_key: API key string (e.g. 'ak_xxx')
+            timeout: request timeout in seconds (default 30)
         """
         self.api_key = api_key
         self.base_url = "https://api.novant.io/v1"
+        self.timeout = timeout
 
     ######
     # Project
@@ -340,17 +344,18 @@ class NovantClient:
         return self._send(req)
 
     def _add_headers(self, req):
-        """Add auth and compression headers."""
+        """Add auth, compression, and user-agent headers."""
         creds = base64.b64encode(
             (self.api_key + ":").encode("utf-8")
         ).decode("utf-8")
         req.add_header("Authorization", "Basic " + creds)
         req.add_header("Accept-Encoding", "gzip")
+        req.add_header("User-Agent", "novant-python/" + self.VERSION)
 
     def _send(self, req):
         """Send request and return parsed JSON response."""
         try:
-            resp = urllib.request.urlopen(req)
+            resp = urllib.request.urlopen(req, timeout=self.timeout)
             return self._read_json(resp)
         except urllib.error.HTTPError as e:
             # attempt to parse error body
