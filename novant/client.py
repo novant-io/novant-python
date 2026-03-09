@@ -13,6 +13,7 @@ import urllib.error
 import base64
 import gzip
 
+from . import __version__
 from .err import NovantErr
 from .models import (
     Project, AssetList, SpaceList, ZoneList, SourceList,
@@ -25,8 +26,6 @@ from .models import (
 
 class NovantClient:
     """Client for the Novant REST API."""
-
-    VERSION = "0.1.0"
 
     def __init__(self, api_key, timeout=30):
         """Create a new NovantClient instance.
@@ -350,7 +349,7 @@ class NovantClient:
         ).decode("utf-8")
         req.add_header("Authorization", "Basic " + creds)
         req.add_header("Accept-Encoding", "gzip")
-        req.add_header("User-Agent", "novant-python/" + self.VERSION)
+        req.add_header("User-Agent", "novant-python/" + __version__)
 
     def _send(self, req):
         """Send request and return parsed JSON response."""
