@@ -66,46 +66,40 @@ arr = trends.to_numpy()
 
 ## API
 
-### NovantClient(api_key)
+### Client
 
-Create a new client with your API key.
+```python
+client = NovantClient(api_key="ak_xxx", timeout=30)
+```
 
-### Project
+Client arguments:
 
-- `project()` → `Project` — Get project metadata
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `api_key` | — | API key string |
+| `timeout` | `30` | Request timeout in seconds |
 
-### Assets, Spaces, Zones, Sources
+### Methods
 
-- `assets(asset_ids=None)` → `AssetList` — List assets
-- `spaces(space_ids=None)` → `SpaceList` — List spaces
-- `zones(zone_ids=None)` → `ZoneList` — List zones
-- `sources(source_ids=None, bound_only=False)` → `SourceList` — List sources
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `project()` | `Project` | Get project metadata |
+| `assets(asset_ids=None)` | `AssetList` | List assets |
+| `spaces(space_ids=None)` | `SpaceList` | List spaces |
+| `zones(zone_ids=None)` | `ZoneList` | List zones |
+| `sources(source_ids=None, bound_only=False)` | `SourceList` | List sources |
+| `points(source_id=None, asset_id=None, point_ids=None)` | `PointList` | List points for a source or asset |
+| `values(source_id=None, asset_id=None, point_ids=None)` | `ValueList` | Get current values |
+| `trends(point_ids, ...)` | `TrendData` | Get historical trend data |
+| `write(point_id, value, level=None)` | `WriteResult` | Write a value to a point |
+| `import_zones(csv_data)` | `dict` | Import zones from CSV |
+| `import_spaces(csv_data)` | `dict` | Import spaces from CSV |
+| `import_assets(csv_data)` | `dict` | Import assets from CSV |
+| `import_sources(csv_data)` | `dict` | Import sources from CSV |
+| `import_source_map(csv_data)` | `dict` | Import source point mappings from CSV |
+| `import_trends(csv_data, mode=None)` | `dict` | Import trend data from CSV |
 
-### Points & Values
-
-- `points(source_id=None, asset_id=None, point_ids=None)` → `PointList` — List points for a source or asset
-- `values(source_id=None, asset_id=None, point_ids=None)` → `ValueList` — Get current values for points
-
-### Trends
-
-- `trends(point_ids, start_date=None, end_date=None, date=None, tz=None, interval=None, aggregate=None)` → `TrendData` — Get historical trend data
-
-Interval options: `auto`, `5min`, `15min`, `30min`, `1hr`, `1day`, `1mo`, `raw`
-
-Aggregate options: `auto`, `mean`, `sum`, `min`, `max`, `diff`
-
-### Write
-
-- `write(point_id, value, level=None)` → `WriteResult` — Write a value to a point. Pass `value=None` to clear a priority hold.
-
-### Import
-
-- `import_zones(csv_data)` — Import zones from CSV
-- `import_spaces(csv_data)` — Import spaces from CSV
-- `import_assets(csv_data)` — Import assets from CSV
-- `import_sources(csv_data)` — Import sources from CSV
-- `import_source_map(csv_data)` — Import source point mappings from CSV
-- `import_trends(csv_data, mode=None)` — Import trend data from CSV (`merge`, `append`, or `prepend`)
+See the [Novant API docs](https://docs.novant.io/api) for full parameter details.
 
 ## Error Handling
 
