@@ -245,6 +245,20 @@ class PointList:
     source_enabled: bool
     points: list[Point]
 
+    def point(self, id):
+        """Lookup a point by id.
+
+        Args:
+            id: point id string
+
+        Returns:
+            Point or None if not found
+        """
+        for p in self.points:
+            if p.id == id:
+                return p
+        return None
+
     @classmethod
     def _from_dict(cls, d):
         return cls(
