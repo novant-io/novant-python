@@ -5,7 +5,7 @@
 #   9 Mar 2026  Andy Frank  Creation
 #
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 from .client import NovantClient
 from .err import NovantErr
