@@ -189,6 +189,7 @@ class Zone:
     type: str
     fed_by_asset_ids: list[str] = field(default_factory=list)
     feeds_space_ids: list[str] = field(default_factory=list)
+    ontology: Optional[Ontology] = None
 
     @classmethod
     def _from_dict(cls, d):
@@ -198,6 +199,7 @@ class Zone:
             type=d["type"],
             fed_by_asset_ids=d.get("fed_by_asset_ids", []),
             feeds_space_ids=d.get("feeds_space_ids", []),
+            ontology=Ontology._from_dict(d.get("ontology")),
         )
 
 @dataclass
