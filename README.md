@@ -41,7 +41,7 @@ for row in client.trends(point_ids=["s.2.4", "s.2.5"], date="2026-03-09"):
     print(row.ts, row.values)
 ```
 
-## Pandas & NumPy
+## Pandas
 
 Install with optional pandas support:
 
@@ -53,15 +53,10 @@ Convert values and trends directly to DataFrames:
 
 ```python
 # Values as DataFrame
-result = client.values(source_id="s.2")
-df = result.to_dataframe()
+df = client.values(source_id="s.2").to_dataframe()
 
 # Trends as DataFrame with DatetimeIndex
-trends = client.trends(point_ids=["s.2.4", "s.2.5"], date="2026-03-09")
-df = trends.to_dataframe()
-
-# Trends as NumPy array
-arr = trends.to_numpy()
+df = client.trends(point_ids=["s.2.4", "s.2.5"], date="2026-03-09").to_dataframe()
 ```
 
 ## API

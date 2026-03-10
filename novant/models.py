@@ -513,28 +513,6 @@ class TrendData:
             df[col] = pd.to_numeric(df[col], errors="coerce")
         return df
 
-    def to_numpy(self):
-        """Convert trend values to a numpy ndarray.
-
-        Returns:
-            2D ndarray with shape (num_rows, num_points)
-        """
-        try:
-            import numpy as np
-        except ImportError:
-            raise ImportError(
-                "numpy is required for to_numpy(). "
-                "Install it with: pip install novant[pandas]"
-            )
-        def _to_float(v):
-            if v is None or v == "na":
-                return np.nan
-            return float(v)
-        return np.array([
-            [_to_float(r.values.get(pid)) for pid in self.point_ids]
-            for r in self.trends
-        ], dtype=np.float64)
-
     @classmethod
     def _from_dict(cls, d):
         return cls(
