@@ -40,8 +40,14 @@ for row in client.trends(point_ids=["s.2.4", "s.2.5"], date="2026-03-09"):
 ```bash
 git clone https://github.com/novant-io/novant-python.git
 cd novant-python
+python3 -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
 pip install -e ".[dev]"
 ```
+
+The `dev` extra installs `pytest`, `build`, and `twine` — everything
+needed for testing and publishing.
 
 ## Testing
 

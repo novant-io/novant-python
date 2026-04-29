@@ -30,7 +30,7 @@ Repository = "https://github.com/novant-io/novant-python"
 
 [project.optional-dependencies]
 pandas = ["pandas>=1.5"]
-dev = ["pytest>=7"]
+dev = ["pytest>=7", "build>=1.0", "twine>=4.0"]
 
 [tool.setuptools.packages.find]
 include = ["novant*"]

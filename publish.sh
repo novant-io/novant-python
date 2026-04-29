@@ -18,6 +18,22 @@ fi
 
 version=$(grep -E '^version = ' pyproject.toml | sed -E 's/version = "(.+)"/\1/')
 
+# Use the project's venv if present, otherwise the active python.
+if [[ -x .venv/bin/python ]]; then
+  PY=.venv/bin/python
+else
+  PY=python
+fi
+
+if ! "$PY" -c "import build, twine" 2>/dev/null; then
+  echo "error: 'build' and/or 'twine' not available on $PY" >&2
+  echo "  set up the venv with:" >&2
+  echo "    python3 -m venv .venv" >&2
+  echo "    source .venv/bin/activate" >&2
+  echo "    pip install -e \".[dev]\"" >&2
+  exit 1
+fi
+
 echo "Publishing novant $version to PyPI"
 read -r -p "Continue? [y/N] " confirm
 if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
@@ -26,11 +42,11 @@ if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
 fi
 
 rm -rf dist/ build/ novant.egg-info/
-python -m build
+"$PY" -m build
 
 TWINE_USERNAME=__token__ \
 TWINE_PASSWORD="$(cat "$token_file")" \
-  python -m twine upload dist/*
+  "$PY" -m twine upload dist/*
 
 git tag "v$version"
 git push --tags
