@@ -5,7 +5,9 @@
 #   9 Mar 2026  Andy Frank  Creation
 #
 
-__version__ = "0.2.0"
+from importlib.metadata import version
+
+__version__ = version("novant")
 
 from .client import NovantClient
 from .err import NovantErr
