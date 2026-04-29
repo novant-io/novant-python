@@ -129,13 +129,16 @@ class NovantClient:
     # Points
     ######
 
-    def points(self, source_id=None, asset_id=None, point_ids=None):
-        """List points for a source or asset.
+    def points(self, source_id=None, asset_id=None, space_id=None,
+               point_ids=None, point_types=None):
+        """List points for a source, asset, or space.
 
         Args:
-            source_id: parent source id (one of source_id or asset_id required)
-            asset_id: parent asset id (one of source_id or asset_id required)
+            source_id: parent source id (one of source_id, asset_id, or space_id required)
+            asset_id: parent asset id (one of source_id, asset_id, or space_id required)
+            space_id: parent space id (one of source_id, asset_id, or space_id required)
             point_ids: optional list of point id strings to filter
+            point_types: optional list of point type strings to filter
 
         Returns:
             PointList
@@ -145,21 +148,28 @@ class NovantClient:
             params["source_id"] = source_id
         if asset_id is not None:
             params["asset_id"] = asset_id
+        if space_id is not None:
+            params["space_id"] = space_id
         if point_ids is not None:
             params["point_ids"] = ",".join(point_ids)
+        if point_types is not None:
+            params["point_types"] = ",".join(point_types)
         return PointList._from_dict(self._get("/points", params))
 
     ######
     # Values
     ######
 
-    def values(self, source_id=None, asset_id=None, point_ids=None):
+    def values(self, source_id=None, asset_id=None, space_id=None,
+               point_ids=None, point_types=None):
         """Get current values for points.
 
         Args:
-            source_id: parent source id (one of source_id or asset_id required)
-            asset_id: parent asset id (one of source_id or asset_id required)
+            source_id: parent source id (one of source_id, asset_id, or space_id required)
+            asset_id: parent asset id (one of source_id, asset_id, or space_id required)
+            space_id: parent space id (one of source_id, asset_id, or space_id required)
             point_ids: optional list of point id strings to filter
+            point_types: optional list of point type strings to filter
 
         Returns:
             ValueList
@@ -169,8 +179,12 @@ class NovantClient:
             params["source_id"] = source_id
         if asset_id is not None:
             params["asset_id"] = asset_id
+        if space_id is not None:
+            params["space_id"] = space_id
         if point_ids is not None:
             params["point_ids"] = ",".join(point_ids)
+        if point_types is not None:
+            params["point_types"] = ",".join(point_types)
         return ValueList._from_dict(self._get("/values", params))
 
     ######
