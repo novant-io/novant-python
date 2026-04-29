@@ -1,6 +1,8 @@
 # Changelog
 
-## Version 0.2 (working)
+## Version 0.3 (working)
+
+## Version 0.2 (29-Apr-2026)
 * Add `space_id` and `point_types` options to `points()` and `values()`
 * Fix `PointList` and `ValueList` parsing to handle responses scoped by
   `asset_id` or `space_id` (parent metadata fields are now optional, and
