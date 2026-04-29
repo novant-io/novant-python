@@ -30,6 +30,10 @@ Repository = "https://github.com/novant-io/novant-python"
 
 [project.optional-dependencies]
 pandas = ["pandas>=1.5"]
+dev = ["pytest>=7"]
 
 [tool.setuptools.packages.find]
 include = ["novant*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

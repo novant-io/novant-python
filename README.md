@@ -40,5 +40,16 @@ for row in client.trends(point_ids=["s.2.4", "s.2.5"], date="2026-03-09"):
 ```bash
 git clone https://github.com/novant-io/novant-python.git
 cd novant-python
-pip install -e .
+pip install -e ".[dev]"
 ```
+
+## Testing
+
+Tests are integration tests that run against the live Novant API. Place a
+test project's API key at `secret/test.key`, then:
+
+```bash
+pytest
+```
+
+Tests are skipped automatically if `secret/test.key` is missing.

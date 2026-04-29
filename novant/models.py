@@ -353,12 +353,21 @@ class Point:
 
 @dataclass
 class PointList:
-    """Response from the points endpoint."""
-    source_id: str
-    source_name: str
-    source_bound: bool
-    source_enabled: bool
+    """Response from the points endpoint.
+
+    The parent metadata fields populated depend on which parent was used
+    in the request: source_id, asset_id, or space_id.
+    """
     points: list[Point]
+    source_id: Optional[str] = None
+    source_name: Optional[str] = None
+    source_bound: Optional[bool] = None
+    source_enabled: Optional[bool] = None
+    asset_id: Optional[str] = None
+    asset_name: Optional[str] = None
+    space_id: Optional[str] = None
+    space_name: Optional[str] = None
+    source_ids: list[str] = field(default_factory=list)
 
     def __iter__(self):
         return iter(self.points)
@@ -383,11 +392,16 @@ class PointList:
     @classmethod
     def _from_dict(cls, d):
         return cls(
-            source_id=d["source_id"],
-            source_name=d["source_name"],
-            source_bound=d["source_bound"],
-            source_enabled=d["source_enabled"],
             points=[Point._from_dict(p) for p in d["points"]],
+            source_id=d.get("source_id"),
+            source_name=d.get("source_name"),
+            source_bound=d.get("source_bound"),
+            source_enabled=d.get("source_enabled"),
+            asset_id=d.get("asset_id"),
+            asset_name=d.get("asset_name"),
+            space_id=d.get("space_id"),
+            space_name=d.get("space_name"),
+            source_ids=d.get("source_ids", []),
         )
 
 #############################################################################
@@ -407,9 +421,16 @@ class PointValue:
 
 @dataclass
 class ValueList:
-    """Response from the values endpoint."""
-    source_id: str
+    """Response from the values endpoint.
+
+    The parent metadata fields populated depend on which parent was used
+    in the request: source_id, asset_id, or space_id.
+    """
     values: list[PointValue]
+    source_id: Optional[str] = None
+    asset_id: Optional[str] = None
+    space_id: Optional[str] = None
+    source_ids: list[str] = field(default_factory=list)
 
     def __iter__(self):
         return iter(self.values)
@@ -454,8 +475,11 @@ class ValueList:
     @classmethod
     def _from_dict(cls, d):
         return cls(
-            source_id=d["source_id"],
             values=[PointValue._from_dict(v) for v in d["values"]],
+            source_id=d.get("source_id"),
+            asset_id=d.get("asset_id"),
+            space_id=d.get("space_id"),
+            source_ids=d.get("source_ids", []),
         )
 
 #############################################################################
