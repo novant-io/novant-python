@@ -1,6 +1,8 @@
 # Changelog
 
 ## Version 0.3 (working)
+
+## Version 0.3 (1-Jun-2026)
 * Add `write_batch`
 * Support for `expires` on `write` calls
 * Support for `source_ids` on `values` calls
