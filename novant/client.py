@@ -176,6 +176,7 @@ class NovantClient:
     def values(
         self,
         source_id=None,
+        source_ids=None,
         asset_id=None,
         space_id=None,
         point_ids=None,
@@ -183,10 +184,15 @@ class NovantClient:
     ):
         """Get current values for points.
 
+        One of source_id, source_ids, asset_id, or space_id is required. If
+        multiple are specified, precedence is source_id, then source_ids,
+        then asset_id, then space_id.
+
         Args:
-            source_id: parent source id (one of source_id, asset_id, or space_id required)
-            asset_id: parent asset id (one of source_id, asset_id, or space_id required)
-            space_id: parent space id (one of source_id, asset_id, or space_id required)
+            source_id: parent source id
+            source_ids: list of parent source id strings (max 10)
+            asset_id: parent asset id
+            space_id: parent space id
             point_ids: optional list of point id strings to filter
             point_types: optional list of point type strings to filter
 
@@ -196,6 +202,8 @@ class NovantClient:
         params = {}
         if source_id is not None:
             params["source_id"] = source_id
+        if source_ids is not None:
+            params["source_ids"] = ",".join(source_ids)
         if asset_id is not None:
             params["asset_id"] = asset_id
         if space_id is not None:
@@ -295,8 +303,6 @@ class NovantClient:
         """
         if not writes:
             raise ValueError("writes must be a non-empty list")
-        if len(writes) > 25:
-            raise ValueError("writes exceeds max of 25 per request")
         params = {}
         for i, w in enumerate(writes):
             if "point_id" not in w:

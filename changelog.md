@@ -1,8 +1,9 @@
 # Changelog
 
 ## Version 0.3 (working)
+* Add `write_batch`
 * Support for `expires` on `write` calls
-* Add `write_batch` API
+* Support for `source_ids` on `values` calls
 
 ## Version 0.2 (29-Apr-2026)
 * Add `space_id` and `point_types` options to `points()` and `values()`

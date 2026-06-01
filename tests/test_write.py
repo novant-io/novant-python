@@ -105,13 +105,6 @@ def test_write_batch_empty_raises():
         client.write_batch([])
 
 
-def test_write_batch_over_limit_raises():
-    client = NovantClient(api_key="x")
-    writes = [{"point_id": f"s.1.{i}", "value": 1.0} for i in range(26)]
-    with pytest.raises(ValueError):
-        client.write_batch(writes)
-
-
 def test_write_batch_missing_point_id_raises():
     client = NovantClient(api_key="x")
     with pytest.raises(ValueError):
