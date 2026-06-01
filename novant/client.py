@@ -6,23 +6,30 @@
 #   9 Mar 2026  Andy Frank  Creation
 #
 
-import json
-import urllib.request
-import urllib.parse
-import urllib.error
 import base64
 import gzip
+import json
+import urllib.error
+import urllib.parse
+import urllib.request
 
 from . import __version__
 from .err import NovantErr
 from .models import (
-    Project, AssetList, SpaceList, ZoneList, SourceList,
-    PointList, ValueList, TrendData, WriteResult,
+    AssetList,
+    PointList,
+    Project,
+    SourceList,
+    SpaceList,
+    TrendData,
+    ValueList,
+    ZoneList,
 )
 
 #############################################################################
 # NovantClient
 #############################################################################
+
 
 class NovantClient:
     """Client for the Novant REST API."""
@@ -129,8 +136,14 @@ class NovantClient:
     # Points
     ######
 
-    def points(self, source_id=None, asset_id=None, space_id=None,
-               point_ids=None, point_types=None):
+    def points(
+        self,
+        source_id=None,
+        asset_id=None,
+        space_id=None,
+        point_ids=None,
+        point_types=None,
+    ):
         """List points for a source, asset, or space.
 
         Args:
@@ -160,8 +173,14 @@ class NovantClient:
     # Values
     ######
 
-    def values(self, source_id=None, asset_id=None, space_id=None,
-               point_ids=None, point_types=None):
+    def values(
+        self,
+        source_id=None,
+        asset_id=None,
+        space_id=None,
+        point_ids=None,
+        point_types=None,
+    ):
         """Get current values for points.
 
         Args:
@@ -191,8 +210,16 @@ class NovantClient:
     # Trends
     ######
 
-    def trends(self, point_ids, start_date=None, end_date=None, date=None,
-               tz=None, interval=None, aggregate=None):
+    def trends(
+        self,
+        point_ids,
+        start_date=None,
+        end_date=None,
+        date=None,
+        tz=None,
+        interval=None,
+        aggregate=None,
+    ):
         """Get historical trend data for points.
 
         Args:
@@ -233,11 +260,11 @@ class NovantClient:
         Args:
             point_id: point id string
             value: numeric value or None to clear priority hold
-            level: optional BACnet priority level (defaults to 16)
+            level: optional priority level (defaults to 16)
             expires: optional auto-release duration, e.g. "1hr", "30min", "1day"
 
         Returns:
-            WriteResult
+            dict with status, e.g. {"status": "ok"}
         """
         params = {"point_id": point_id}
         if value is None:
@@ -248,7 +275,42 @@ class NovantClient:
             params["level"] = str(level)
         if expires is not None:
             params["expires"] = str(expires)
-        return WriteResult._from_dict(self._post("/write", params))
+        return self._post("/write", params)
+
+    def write_batch(self, writes):
+        """Write values to multiple points in a single request.
+
+        Validation is all-or-nothing: if any entry is invalid the entire
+        request is rejected and no writes are committed.
+
+        Args:
+            writes: list of dicts, each with keys:
+                point_id (required): point id string
+                value (required): numeric value or None to clear priority hold
+                level (optional): priority level (defaults to 16)
+                expires (optional): auto-release duration, e.g. "1hr", "1day"
+
+        Returns:
+            dict with status, e.g. {"status": "ok"}
+        """
+        if not writes:
+            raise ValueError("writes must be a non-empty list")
+        if len(writes) > 25:
+            raise ValueError("writes exceeds max of 25 per request")
+        params = {}
+        for i, w in enumerate(writes):
+            if "point_id" not in w:
+                raise ValueError(f"writes[{i}] missing required 'point_id'")
+            if "value" not in w:
+                raise ValueError(f"writes[{i}] missing required 'value'")
+            params[f"writes[{i}][point_id]"] = w["point_id"]
+            value = w["value"]
+            params[f"writes[{i}][value]"] = "null" if value is None else str(value)
+            if w.get("level") is not None:
+                params[f"writes[{i}][level]"] = str(w["level"])
+            if w.get("expires") is not None:
+                params[f"writes[{i}][expires]"] = str(w["expires"])
+        return self._post("/write", params)
 
     ######
     # Import
@@ -361,9 +423,7 @@ class NovantClient:
 
     def _add_headers(self, req):
         """Add auth, compression, and user-agent headers."""
-        creds = base64.b64encode(
-            (self.api_key + ":").encode("utf-8")
-        ).decode("utf-8")
+        creds = base64.b64encode((self.api_key + ":").encode("utf-8")).decode("utf-8")
         req.add_header("Authorization", "Basic " + creds)
         req.add_header("Accept-Encoding", "gzip")
         req.add_header("User-Agent", "novant-python/" + __version__)

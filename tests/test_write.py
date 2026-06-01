@@ -6,22 +6,17 @@
 # hit the live API or mutate any project state.
 #
 
+import pytest
+
 from novant import NovantClient
-from novant.models import WriteResult
 
 
 def _stub_post(client, captured):
-    """Replace _post to capture args and return a fake WriteResult dict."""
+    """Replace _post to capture args and return a {"status": "ok"} response."""
     def fake(path, params):
         captured["path"] = path
         captured["params"] = params
-        return {
-            "point_id": params.get("point_id"),
-            "level": 16,
-            "source_id": "s.1",
-            "value": params.get("value"),
-            "status": "ok",
-        }
+        return {"status": "ok"}
     client._post = fake
 
 
@@ -30,7 +25,7 @@ def test_write_basic():
     captured = {}
     _stub_post(client, captured)
     res = client.write("s.1.3", 25.0)
-    assert isinstance(res, WriteResult)
+    assert res == {"status": "ok"}
     assert captured["path"] == "/write"
     assert captured["params"] == {"point_id": "s.1.3", "value": "25.0"}
 
@@ -71,3 +66,59 @@ def test_write_null_clears_hold():
     _stub_post(client, captured)
     client.write("s.1.3", None)
     assert captured["params"] == {"point_id": "s.1.3", "value": "null"}
+
+
+def test_write_batch_encodes_bracket_notation():
+    client = NovantClient(api_key="x")
+    captured = {}
+    _stub_post(client, captured)
+    res = client.write_batch([
+        {"point_id": "s.1.3", "value": 25.0, "level": 8},
+        {"point_id": "s.1.4", "value": 20.0, "expires": "1hr"},
+    ])
+    assert captured["path"] == "/write"
+    assert captured["params"] == {
+        "writes[0][point_id]": "s.1.3",
+        "writes[0][value]": "25.0",
+        "writes[0][level]": "8",
+        "writes[1][point_id]": "s.1.4",
+        "writes[1][value]": "20.0",
+        "writes[1][expires]": "1hr",
+    }
+    assert res == {"status": "ok"}
+
+
+def test_write_batch_null_clears_hold():
+    client = NovantClient(api_key="x")
+    captured = {}
+    _stub_post(client, captured)
+    client.write_batch([{"point_id": "s.1.3", "value": None}])
+    assert captured["params"] == {
+        "writes[0][point_id]": "s.1.3",
+        "writes[0][value]": "null",
+    }
+
+
+def test_write_batch_empty_raises():
+    client = NovantClient(api_key="x")
+    with pytest.raises(ValueError):
+        client.write_batch([])
+
+
+def test_write_batch_over_limit_raises():
+    client = NovantClient(api_key="x")
+    writes = [{"point_id": f"s.1.{i}", "value": 1.0} for i in range(26)]
+    with pytest.raises(ValueError):
+        client.write_batch(writes)
+
+
+def test_write_batch_missing_point_id_raises():
+    client = NovantClient(api_key="x")
+    with pytest.raises(ValueError):
+        client.write_batch([{"value": 1.0}])
+
+
+def test_write_batch_missing_value_raises():
+    client = NovantClient(api_key="x")
+    with pytest.raises(ValueError):
+        client.write_batch([{"point_id": "s.1.3"}])

@@ -548,26 +548,3 @@ class TrendData:
             point_ids=d["point_ids"],
             trends=[TrendRow._from_dict(r) for r in d["trends"]],
         )
-
-#############################################################################
-# WriteResult
-#############################################################################
-
-@dataclass
-class WriteResult:
-    """Response from the write endpoint."""
-    point_id: str
-    level: int
-    source_id: Any
-    value: str
-    status: str
-
-    @classmethod
-    def _from_dict(cls, d):
-        return cls(
-            point_id=d["point_id"],
-            level=d["level"],
-            source_id=d["source_id"],
-            value=d["value"],
-            status=d["status"],
-        )
