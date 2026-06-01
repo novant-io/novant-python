@@ -1,6 +1,7 @@
 # Changelog
 
 ## Version 0.3 (working)
+* Support for `expires` on `write` calls
 
 ## Version 0.2 (29-Apr-2026)
 * Add `space_id` and `point_types` options to `points()` and `values()`

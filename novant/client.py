@@ -227,13 +227,14 @@ class NovantClient:
     # Write
     ######
 
-    def write(self, point_id, value, level=None):
+    def write(self, point_id, value, level=None, expires=None):
         """Write a value to a point.
 
         Args:
             point_id: point id string
             value: numeric value or None to clear priority hold
             level: optional BACnet priority level (defaults to 16)
+            expires: optional auto-release duration, e.g. "1hr", "30min", "1day"
 
         Returns:
             WriteResult
@@ -245,6 +246,8 @@ class NovantClient:
             params["value"] = str(value)
         if level is not None:
             params["level"] = str(level)
+        if expires is not None:
+            params["expires"] = str(expires)
         return WriteResult._from_dict(self._post("/write", params))
 
     ######
