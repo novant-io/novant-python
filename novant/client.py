@@ -19,6 +19,7 @@ from .models import (
     AssetList,
     PointList,
     Project,
+    SceneList,
     SourceList,
     SpaceList,
     TrendData,
@@ -257,6 +258,24 @@ class NovantClient:
         if aggregate is not None:
             params["aggregate"] = aggregate
         return TrendData._from_dict(self._get("/trends", params))
+
+    ######
+    # Scenes
+    ######
+
+    def scenes(self, scene_id=None):
+        """List scenes for this project.
+
+        Args:
+            scene_id: optional scene id string to fetch a single scene
+
+        Returns:
+            SceneList
+        """
+        params = {}
+        if scene_id is not None:
+            params["scene_id"] = scene_id
+        return SceneList._from_dict(self._get("/scenes", params))
 
     ######
     # Write

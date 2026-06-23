@@ -105,6 +105,9 @@ class AssetList:
     def __iter__(self):
         return iter(self.assets)
 
+    def __getitem__(self, i):
+        return self.assets[i]
+
     def __len__(self):
         return len(self.assets)
 
@@ -166,6 +169,9 @@ class SpaceList:
     def __iter__(self):
         return iter(self.spaces)
 
+    def __getitem__(self, i):
+        return self.spaces[i]
+
     def __len__(self):
         return len(self.spaces)
 
@@ -221,6 +227,9 @@ class ZoneList:
 
     def __iter__(self):
         return iter(self.zones)
+
+    def __getitem__(self, i):
+        return self.zones[i]
 
     def __len__(self):
         return len(self.zones)
@@ -285,6 +294,9 @@ class SourceList:
 
     def __iter__(self):
         return iter(self.sources)
+
+    def __getitem__(self, i):
+        return self.sources[i]
 
     def __len__(self):
         return len(self.sources)
@@ -372,6 +384,9 @@ class PointList:
     def __iter__(self):
         return iter(self.points)
 
+    def __getitem__(self, i):
+        return self.points[i]
+
     def __len__(self):
         return len(self.points)
 
@@ -434,6 +449,9 @@ class ValueList:
 
     def __iter__(self):
         return iter(self.values)
+
+    def __getitem__(self, i):
+        return self.values[i]
 
     def __len__(self):
         return len(self.values)
@@ -512,6 +530,9 @@ class TrendData:
     def __iter__(self):
         return iter(self.trends)
 
+    def __getitem__(self, i):
+        return self.trends[i]
+
     def __len__(self):
         return len(self.trends)
 
@@ -548,3 +569,106 @@ class TrendData:
             point_ids=d["point_ids"],
             trends=[TrendRow._from_dict(r) for r in d["trends"]],
         )
+
+#############################################################################
+# SceneMode / Scene / SceneList
+#############################################################################
+
+@dataclass
+class SceneMode:
+    """A named mode within a scene, mapping point ids to target values."""
+    id: str
+    name: str
+    vals: dict[str, Any]   # point id -> target value
+
+    def __iter__(self):
+        return iter(self.vals)
+
+    def __getitem__(self, id):
+        return self.vals[id]
+
+    def __len__(self):
+        return len(self.vals)
+
+    @classmethod
+    def _from_dict(cls, d):
+        return cls(id=d["id"], name=d["name"], vals=dict(d.get("vals", {})))
+
+@dataclass
+class Scene:
+    """A scene: a set of point target values across one or more modes."""
+    id: str
+    name: str
+    point_ids: list[str]
+    modes: list[SceneMode]
+
+    def __iter__(self):
+        return iter(self.modes)
+
+    def __getitem__(self, i):
+        return self.modes[i]
+
+    def __len__(self):
+        return len(self.modes)
+
+    def mode(self, id):
+        """Lookup a mode by id.
+
+        Args:
+            id: full mode id string (e.g. "sn.5.1"), or the integer id
+                suffix (e.g. 1 to match "sn.5.1")
+
+        Returns:
+            SceneMode or None if not found
+        """
+        if isinstance(id, int):
+            suffix = str(id)
+            for m in self.modes:
+                if m.id.split(".")[-1] == suffix:
+                    return m
+            return None
+        for m in self.modes:
+            if m.id == id:
+                return m
+        return None
+
+    @classmethod
+    def _from_dict(cls, d):
+        return cls(
+            id=d["id"],
+            name=d["name"],
+            point_ids=d.get("point_ids", []),
+            modes=[SceneMode._from_dict(m) for m in d.get("modes", [])],
+        )
+
+@dataclass
+class SceneList:
+    """Response from the scenes endpoint."""
+    scenes: list[Scene]
+
+    def __iter__(self):
+        return iter(self.scenes)
+
+    def __getitem__(self, i):
+        return self.scenes[i]
+
+    def __len__(self):
+        return len(self.scenes)
+
+    def scene(self, id):
+        """Lookup a scene by id.
+
+        Args:
+            id: scene id string
+
+        Returns:
+            Scene or None if not found
+        """
+        for s in self.scenes:
+            if s.id == id:
+                return s
+        return None
+
+    @classmethod
+    def _from_dict(cls, d):
+        return cls(scenes=[Scene._from_dict(s) for s in d["scenes"]])

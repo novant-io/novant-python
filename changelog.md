@@ -1,6 +1,8 @@
 # Changelog
 
 ## Version 0.3 (working)
+* Add `scenes`
+* Add `__getitem__` support to all list types
 
 ## Version 0.3 (1-Jun-2026)
 * Add `write_batch`

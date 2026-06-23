@@ -15,4 +15,5 @@ from .models import (
     Project, Asset, AssetList, Space, SpaceList, Zone, ZoneList,
     Source, SourceList, Point, PointList, EnumState, Ontology,
     PointValue, ValueList, TrendRow, TrendData,
+    SceneMode, Scene, SceneList,
 )

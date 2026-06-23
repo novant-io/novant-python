@@ -29,6 +29,22 @@ def test_values_by_source_id():
     assert captured["params"] == {"source_id": "s.2"}
 
 
+def test_values_index_and_slice_access():
+    client = NovantClient(api_key="x")
+    captured = {}
+    _stub_get(client, captured)
+    client._get = lambda path, params=None: {
+        "values": [
+            {"id": "s.2.4", "val": 72.5, "status": "ok"},
+            {"id": "s.2.5", "val": 68.0, "status": "ok"},
+        ]
+    }
+    res = client.values(source_id="s.2")
+    assert res[0].id == "s.2.4"
+    assert res[1].val == 68.0
+    assert [v.id for v in res[0:2]] == ["s.2.4", "s.2.5"]
+
+
 def test_values_by_source_ids():
     client = NovantClient(api_key="x")
     captured = {}
