@@ -2,6 +2,7 @@
 
 ## Version 0.3 (working)
 * Add `scenes`
+* Add `schedules`
 * Add `__getitem__` support to all list types
 
 ## Version 0.3 (1-Jun-2026)

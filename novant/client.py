@@ -20,6 +20,7 @@ from .models import (
     PointList,
     Project,
     SceneList,
+    ScheduleList,
     SourceList,
     SpaceList,
     TrendData,
@@ -276,6 +277,24 @@ class NovantClient:
         if scene_id is not None:
             params["scene_id"] = scene_id
         return SceneList._from_dict(self._get("/scenes", params))
+
+    ######
+    # Schedules
+    ######
+
+    def schedules(self, schedule_id=None):
+        """List schedules for this project.
+
+        Args:
+            schedule_id: optional schedule id string to fetch a single schedule
+
+        Returns:
+            ScheduleList
+        """
+        params = {}
+        if schedule_id is not None:
+            params["schedule_id"] = schedule_id
+        return ScheduleList._from_dict(self._get("/schedules", params))
 
     ######
     # Write

@@ -16,4 +16,5 @@ from .models import (
     Source, SourceList, Point, PointList, EnumState, Ontology,
     PointValue, ValueList, TrendRow, TrendData,
     SceneMode, Scene, SceneList,
+    ScheduleRule, Schedule, ScheduleList,
 )

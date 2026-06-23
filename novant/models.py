@@ -6,6 +6,8 @@
 #   9 Mar 2026  Andy Frank  Creation
 #
 
+import datetime
+
 from dataclasses import dataclass, field
 from typing import Any, Optional
 
@@ -672,3 +674,181 @@ class SceneList:
     @classmethod
     def _from_dict(cls, d):
         return cls(scenes=[Scene._from_dict(s) for s in d["scenes"]])
+
+#############################################################################
+# ScheduleRule / Schedule / ScheduleList
+#############################################################################
+
+# weekday abbreviation -> Python weekday ordinal (0=Mon .. 6=Sun)
+_WEEKDAYS = {
+    "mon": 0, "tue": 1, "wed": 2, "thu": 3, "fri": 4, "sat": 5, "sun": 6,
+}
+
+def _parse_time(s):
+    """Parse a strict 24hr 'h:mm' or 'hh:mm' time string."""
+    parts = s.split(":")
+    if len(parts) != 2 or not parts[0].isdigit() or not parts[1].isdigit():
+        raise ValueError(f"Invalid time: {s}")
+    h, m = int(parts[0]), int(parts[1])
+    if h > 23 or m > 59:
+        raise ValueError(f"Invalid time: {s}")
+    return datetime.time(h, m)
+
+def _parse_weekday(s):
+    """Parse a weekday abbreviation into a 0=Mon..6=Sun ordinal."""
+    try:
+        return _WEEKDAYS[s.lower()]
+    except KeyError:
+        raise ValueError(f"Invalid weekday: {s}")
+
+def _parse_rule(seg):
+    """Parse a single '<days> hh:mm-hh:mm' schedule item."""
+    tokens = seg.split()
+    if len(tokens) != 2:
+        raise ValueError(f"Invalid schedule item: {seg!r}")
+    days, time_range = tokens
+    start_end = time_range.split("-")
+    if len(start_end) != 2:
+        raise ValueError(f"Invalid time range: {time_range!r}")
+    start = _parse_time(start_end[0])
+    end = _parse_time(start_end[1])
+    if days.lower() == "weekdays":
+        return ScheduleRule(_WEEKDAYS["mon"], _WEEKDAYS["fri"], start, end)
+    if "-" in days:
+        a, _, b = days.partition("-")
+        return ScheduleRule(_parse_weekday(a), _parse_weekday(b), start, end)
+    d = _parse_weekday(days)
+    return ScheduleRule(d, d, start, end)
+
+def _parse_schedule(s):
+    """Parse a comma-separated schedule string into a list of rules."""
+    rules = [_parse_rule(seg.strip()) for seg in s.split(",")]
+    if not rules:
+        raise ValueError(f"Invalid schedule: {s!r}")
+    return rules
+
+@dataclass
+class ScheduleRule:
+    """A single '<days> hh:mm-hh:mm' occupancy rule.
+
+    Days are a contiguous weekday range (start_day..end_day) using Python
+    weekday ordinals (0=Mon .. 6=Sun). The range may wrap across the
+    weekend, e.g. fri..mon covers Fri, Sat, Sun, Mon.
+    """
+    start_day: int
+    end_day: int
+    start: datetime.time   # inclusive
+    end: datetime.time     # exclusive
+
+    @property
+    def days(self):
+        """Frozenset of weekday ordinals (0=Mon..6=Sun) this rule covers."""
+        if self.start_day <= self.end_day:
+            return frozenset(range(self.start_day, self.end_day + 1))
+        return frozenset([*range(self.start_day, 7), *range(0, self.end_day + 1)])
+
+    def _day_contains(self, wd):
+        si, ei = self.start_day, self.end_day
+        if si <= ei:
+            return si <= wd <= ei
+        return wd >= si or wd <= ei
+
+    def matches(self, current_time=None, tolerance=None):
+        """Return True if current_time falls within this rule.
+
+        current_time is a datetime evaluated in its own timezone, so pass a
+        project-local datetime; it defaults to datetime.now(). tolerance (a
+        timedelta) widens the window directionally: the start is shifted
+        earlier by tolerance while the end is left unchanged.
+        """
+        if current_time is None:
+            current_time = datetime.datetime.now()
+        # check today and tomorrow: a start shifted back by tolerance may
+        # pull the next day's window into the current day
+        today = current_time.date()
+        for d in (today, today + datetime.timedelta(days=1)):
+            if not self._day_contains(d.weekday()):
+                continue
+            tz = current_time.tzinfo
+            start_dt = datetime.datetime.combine(d, self.start, tz)
+            end_dt = datetime.datetime.combine(d, self.end, tz)
+            if tolerance is not None:
+                start_dt -= tolerance
+            if start_dt <= current_time < end_dt:
+                return True
+        return False
+
+@dataclass
+class Schedule:
+    """A schedule: occupancy rules plus the scene modes applied when the
+    schedule is active or inactive."""
+    id: str
+    name: str
+    schedule: str                  # raw canonical schedule string
+    rules: list[ScheduleRule]      # decoded from `schedule`
+    active_mode_ids: list[str]
+    inactive_mode_ids: list[str]
+
+    def __iter__(self):
+        return iter(self.rules)
+
+    def __len__(self):
+        return len(self.rules)
+
+    def __getitem__(self, i):
+        return self.rules[i]
+
+    def active(self, current_time=None, tolerance=None):
+        """Return True if the schedule is active (occupied) at current_time.
+
+        current_time is a project-local datetime and defaults to
+        datetime.now(). tolerance (a timedelta) widens each rule's window
+        directionally: it shifts the start earlier by tolerance and leaves
+        the end unchanged.
+        """
+        if current_time is None:
+            current_time = datetime.datetime.now()
+        return any(r.matches(current_time, tolerance) for r in self.rules)
+
+    @classmethod
+    def _from_dict(cls, d):
+        return cls(
+            id=d["id"],
+            name=d["name"],
+            schedule=d["schedule"],
+            rules=_parse_schedule(d["schedule"]),
+            active_mode_ids=d.get("active_mode_ids", []),
+            inactive_mode_ids=d.get("inactive_mode_ids", []),
+        )
+
+@dataclass
+class ScheduleList:
+    """Response from the schedules endpoint."""
+    schedules: list[Schedule]
+
+    def __iter__(self):
+        return iter(self.schedules)
+
+    def __len__(self):
+        return len(self.schedules)
+
+    def __getitem__(self, i):
+        return self.schedules[i]
+
+    def schedule(self, id):
+        """Lookup a schedule by id.
+
+        Args:
+            id: schedule id string
+
+        Returns:
+            Schedule or None if not found
+        """
+        for s in self.schedules:
+            if s.id == id:
+                return s
+        return None
+
+    @classmethod
+    def _from_dict(cls, d):
+        return cls(schedules=[Schedule._from_dict(s) for s in d["schedules"]])
