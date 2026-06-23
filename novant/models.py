@@ -671,6 +671,20 @@ class SceneList:
                 return s
         return None
 
+    def mode(self, mode_id):
+        """Resolve a full mode id to its SceneMode.
+
+        The parent scene is derived from the id (e.g. "sn.1.2" -> "sn.1").
+
+        Args:
+            mode_id: full mode id string (e.g. "sn.1.2")
+
+        Returns:
+            SceneMode or None if the scene or mode is not found
+        """
+        scene = self.scene(mode_id.rsplit(".", 1)[0])
+        return scene.mode(mode_id) if scene else None
+
     @classmethod
     def _from_dict(cls, d):
         return cls(scenes=[Scene._from_dict(s) for s in d["scenes"]])

@@ -140,3 +140,19 @@ def test_scenes_lookup_miss_returns_none():
     assert res.scene("nope") is None
     assert res.scene("sn.5").mode("nope") is None
     assert res.scene("sn.5").mode("sn.5.1").vals.get("nope") is None
+
+
+def test_scenes_resolve_mode_id():
+    client = NovantClient(api_key="x")
+    captured = {}
+    _stub_get(client, captured, SAMPLE)
+    res = client.scenes()
+    # full mode id resolves to its SceneMode (parent scene derived from id)
+    mode = res.mode("sn.5.2")
+    assert isinstance(mode, SceneMode)
+    assert mode.id == "sn.5.2"
+    assert mode.name == "unoccupied"
+    assert res.mode("sn.5.1").name == "occupied"
+    # misses: unknown mode, unknown scene
+    assert res.mode("sn.5.9") is None
+    assert res.mode("sn.9.1") is None
