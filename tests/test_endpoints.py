@@ -20,6 +20,9 @@ from novant.models import (
     Point, PointList,
     PointValue, ValueList,
     TrendData, TrendRow,
+    ExplorerOp, ExplorerOpList,
+    ExplorerPoint, ExplorerPointList,
+    ExplorerSource, ExplorerSourceList,
 )
 
 
@@ -154,3 +157,44 @@ def test_trends(client, any_source_id):
         assert isinstance(row, TrendRow)
         assert isinstance(row.ts, str)
         assert isinstance(row.values, dict)
+
+
+# explorer_scan and explorer_learn are not covered here: they queue real
+# work on an edge node and take minutes to complete.
+
+def test_explorer_ops(client):
+    res = client.explorer_ops()
+    assert isinstance(res, ExplorerOpList)
+    for o in res:
+        assert isinstance(o, ExplorerOp)
+        assert isinstance(o.id, str)
+        assert isinstance(o.op, str)
+        assert o.state in ("queued", "active", "ok", "error")
+        assert o.done == (o.state in ("ok", "error"))
+
+
+def test_explorer_sources(client):
+    res = client.explorer_sources()
+    assert isinstance(res, ExplorerSourceList)
+    for s in res:
+        assert isinstance(s, ExplorerSource)
+        assert isinstance(s.id, str)
+        assert isinstance(s.name, str)
+        assert isinstance(s.type, str)
+
+
+def test_explorer_points(client):
+    sources = client.explorer_sources()
+    learned = [s for s in sources if s.last_learn is not None]
+    if not learned:
+        pytest.skip("test project has no learned explorer sources")
+    source_id = learned[0].id
+    res = client.explorer_points(source_id=source_id)
+    assert isinstance(res, ExplorerPointList)
+    assert isinstance(res.source, ExplorerSource)
+    assert res.source.id == source_id
+    assert res.source.point_count == len(res)
+    for p in res:
+        assert isinstance(p, ExplorerPoint)
+        assert isinstance(p.name, str)
+        assert isinstance(p.addr, str)

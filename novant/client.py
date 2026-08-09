@@ -17,6 +17,9 @@ from . import __version__
 from .err import NovantErr
 from .models import (
     AssetList,
+    ExplorerOpList,
+    ExplorerPointList,
+    ExplorerSourceList,
     PointList,
     Project,
     SceneList,
@@ -357,6 +360,126 @@ class NovantClient:
         return self._post("/write", params)
 
     ######
+    # Explorer
+    ######
+
+    def explorer_scan(self, op, node_id=None, **params):
+        """Queue a discovery operation on an edge node.
+
+        Scans run asynchronously: this returns an op_id once the operation
+        is queued. Poll explorer_ops() no faster than once every 30 seconds
+        until the op is done, then read results from explorer_sources().
+
+        Each op accepts its own parameters, passed as keyword args. Any
+        parameter not specified falls back to its default:
+
+            bacnet-scan    broadcast across a range of device instance ids
+                port       UDP port to scan (default 47808)
+                range_low  lowest device instance id, 0-4194303 (default 0)
+                range_high highest device instance id (default 4194303)
+
+            bacnet-find    probe an explicit list of addresses
+                ip_addrs   required, list or comma separated IP addresses
+                port       UDP port to probe (default 47808)
+                max_time   max time to search, 1min-15min (default 5min)
+
+            jasper-scan    scan a Niagara instance for Jasper sources
+                ip_addr    required, IP address of the Niagara instance
+                credential required, name of credential used to connect
+                port       TCP port for the Niagara WebService (default 443)
+                tls        use TLS as a bool; defaults to True for ports
+                           ending in 443 and False otherwise
+
+            kaiterra-find  find Kaiterra sources by device identifier
+                uuids      required, list or comma separated device UDIDs
+                credential required, name of credential used for device data
+
+        Credentials are referenced by name, not id - the same name shown in
+        Project Settings.
+
+        Args:
+            op: discovery operation to run, i.e.: "bacnet-scan"
+            node_id: optional edge node serial number (defaults to the
+                first node in the project)
+            **params: op specific parameters as documented above; list
+                values are joined with commas and bools sent as true/false
+
+        Returns:
+            dict with status and op id, e.g. {"status": "ok", "op_id": "0a1b"}
+        """
+        args = {"op": op}
+        if node_id is not None:
+            args["node_id"] = node_id
+        for k, v in params.items():
+            if v is not None:
+                args[k] = self._encode_param(v)
+        return self._post("/explorer/scan", args)
+
+    def explorer_learn(self, source_id, node_id=None):
+        """Queue a learn operation to read a discovered source's point list.
+
+        Learns run asynchronously: this returns an op_id once the operation
+        is queued. Poll explorer_ops() no faster than once every 30 seconds
+        until the op is done, then read results from explorer_points().
+
+        Everything else is derived from the source itself - its protocol,
+        address, device id, and any credential used to discover it. Learning
+        a source that has already been learned replaces its previous results.
+
+        Args:
+            source_id: discovery id of the source to learn, as returned by
+                explorer_sources()
+            node_id: optional edge node serial number (defaults to the node
+                that discovered the source)
+
+        Returns:
+            dict with status and op id, e.g. {"status": "ok", "op_id": "0a1b"}
+        """
+        params = {"source_id": source_id}
+        if node_id is not None:
+            params["node_id"] = node_id
+        return self._post("/explorer/learn", params)
+
+    def explorer_ops(self):
+        """Get the status of explorer operations in this project.
+
+        Returns every queued and active operation, plus those completed in
+        the last 24 hours. A single request covers all outstanding ops, so
+        there is no need to poll per op id. Do not poll faster than once
+        every 30 seconds.
+
+        Returns:
+            ExplorerOpList
+        """
+        return ExplorerOpList._from_dict(self._get("/explorer/ops"))
+
+    def explorer_sources(self):
+        """List the sources discovered in this project.
+
+        Sources accumulate across scans, so compare last_scan to identify
+        what the most recent scan found.
+
+        Returns:
+            ExplorerSourceList
+        """
+        return ExplorerSourceList._from_dict(self._get("/explorer/sources"))
+
+    def explorer_points(self, source_id):
+        """List the points advertised by a discovered source.
+
+        The point list reflects the source's last learn, so it is empty
+        until the source has been learned; see explorer_learn().
+
+        Args:
+            source_id: discovery id of the source, i.e.: "23a769452950"
+
+        Returns:
+            ExplorerPointList
+        """
+        params = {"source_id": source_id}
+        return ExplorerPointList._from_dict(self._get("/explorer/points", params))
+
+    ######
     # Import
     ######
 
@@ -436,6 +559,14 @@ class NovantClient:
     ##########################################################################
     # Private
     ##########################################################################
+
+    def _encode_param(self, val):
+        """Encode a param value: lists join with commas, bools as true/false."""
+        if isinstance(val, bool):
+            return "true" if val else "false"
+        if isinstance(val, (list, tuple)):
+            return ",".join(str(v) for v in val)
+        return str(val)
 
     def _get(self, path, params=None):
         """Perform a GET request."""

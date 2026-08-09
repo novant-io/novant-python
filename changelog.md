@@ -1,8 +1,10 @@
 # Changelog
 
-## Version 0.4 (working)
+## Version 0.5 (working)
+* Add explorer API: `explorer_scan`, `explorer_learn`, `explorer_ops`,
+  `explorer_sources`, and `explorer_points`
 
-## Version 0.3 (23-Jun-2026)
+## Version 0.4 (23-Jun-2026)
 * Add `scenes`
 * Add `schedules`
 * Add `__getitem__` support to all list types

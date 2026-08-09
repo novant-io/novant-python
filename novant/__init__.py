@@ -17,4 +17,7 @@ from .models import (
     PointValue, ValueList, TrendRow, TrendData,
     SceneMode, Scene, SceneList,
     ScheduleRule, Schedule, ScheduleList,
+    ExplorerOp, ExplorerOpList,
+    ExplorerSource, ExplorerSourceList,
+    ExplorerPoint, ExplorerPointList,
 )

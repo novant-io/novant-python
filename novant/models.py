@@ -866,3 +866,249 @@ class ScheduleList:
     @classmethod
     def _from_dict(cls, d):
         return cls(schedules=[Schedule._from_dict(s) for s in d["schedules"]])
+
+#############################################################################
+# ExplorerOp / ExplorerOpList
+#############################################################################
+
+@dataclass
+class ExplorerOp:
+    """An explorer scan or learn operation.
+
+    Operations run asynchronously on an edge node: `state` starts as
+    "queued", becomes "active" once the node picks it up, and finishes
+    as "ok" or "error".
+    """
+    id: str
+    op: str
+    state: str
+    node_id: Optional[str] = None
+    source_id: Optional[str] = None     # learn operations only
+    started: Optional[str] = None       # set once the op begins
+    finished: Optional[str] = None      # set once the op is done
+    summary: Optional[str] = None       # human-readable result
+    err_code: Optional[str] = None      # set only when state is "error"
+
+    @property
+    def done(self):
+        """True if this op reached a terminal state (ok or error)."""
+        return self.state == "ok" or self.state == "error"
+
+    @property
+    def ok(self):
+        """True if this op completed successfully."""
+        return self.state == "ok"
+
+    @property
+    def error(self):
+        """True if this op failed; see err_code for the reason."""
+        return self.state == "error"
+
+    @classmethod
+    def _from_dict(cls, d):
+        return cls(
+            id=d["id"],
+            op=d["op"],
+            state=d["state"],
+            node_id=d.get("node_id"),
+            source_id=d.get("source_id"),
+            started=d.get("started"),
+            finished=d.get("finished"),
+            summary=d.get("summary"),
+            err_code=d.get("err_code"),
+        )
+
+@dataclass
+class ExplorerOpList:
+    """Response from the explorer ops endpoint.
+
+    Contains every explorer operation in the project: queued, active, and
+    those completed in the last 24 hours. An op_id that no longer appears
+    completed more than 24 hours ago; it is not an error.
+    """
+    ops: list[ExplorerOp]
+
+    def __iter__(self):
+        return iter(self.ops)
+
+    def __getitem__(self, i):
+        return self.ops[i]
+
+    def __len__(self):
+        return len(self.ops)
+
+    def op(self, id):
+        """Lookup an operation by id.
+
+        Args:
+            id: op id string as returned by explorer_scan or explorer_learn
+
+        Returns:
+            ExplorerOp or None if not found
+        """
+        for o in self.ops:
+            if o.id == id:
+                return o
+        return None
+
+    @classmethod
+    def _from_dict(cls, d):
+        return cls(ops=[ExplorerOp._from_dict(o) for o in d["ops"]])
+
+#############################################################################
+# ExplorerSource / ExplorerSourceList
+#############################################################################
+
+@dataclass
+class ExplorerSource:
+    """A source discovered by an explorer scan.
+
+    The `id` is a discovery id (i.e.: "c1578fe370e4"), distinct from the
+    "s.<n>" id assigned once a source is bound into the project.
+
+    The device metadata fields are populated from data reported by the
+    source and may be None when the source does not advertise them.
+    """
+    id: str
+    name: str
+    type: str
+    addr: Optional[str] = None
+    device_id: Optional[int] = None
+    path: Optional[str] = None
+    vendor: Optional[str] = None
+    model: Optional[str] = None
+    version: Optional[str] = None
+    firmware: Optional[str] = None
+    desc: Optional[str] = None
+    last_scan: Optional[str] = None     # None until scanned
+    last_learn: Optional[str] = None    # None until learned
+    point_count: Optional[int] = None   # None until learned
+
+    @classmethod
+    def _from_dict(cls, d):
+        return cls(
+            id=d["id"],
+            name=d["name"],
+            type=d["type"],
+            addr=d.get("addr"),
+            device_id=d.get("device_id"),
+            path=d.get("path"),
+            vendor=d.get("vendor"),
+            model=d.get("model"),
+            version=d.get("version"),
+            firmware=d.get("firmware"),
+            desc=d.get("desc"),
+            last_scan=d.get("last_scan"),
+            last_learn=d.get("last_learn"),
+            point_count=d.get("point_count"),
+        )
+
+@dataclass
+class ExplorerSourceList:
+    """Response from the explorer sources endpoint.
+
+    Sources accumulate across scans, so compare `last_scan` to identify
+    what the most recent scan found.
+    """
+    sources: list[ExplorerSource]
+
+    def __iter__(self):
+        return iter(self.sources)
+
+    def __getitem__(self, i):
+        return self.sources[i]
+
+    def __len__(self):
+        return len(self.sources)
+
+    def source(self, id):
+        """Lookup a discovered source by discovery id.
+
+        Args:
+            id: discovery id string
+
+        Returns:
+            ExplorerSource or None if not found
+        """
+        for s in self.sources:
+            if s.id == id:
+                return s
+        return None
+
+    @classmethod
+    def _from_dict(cls, d):
+        return cls(
+            sources=[ExplorerSource._from_dict(s) for s in d["sources"]],
+        )
+
+#############################################################################
+# ExplorerPoint / ExplorerPointList
+#############################################################################
+
+@dataclass
+class ExplorerPoint:
+    """A point advertised by a discovered source.
+
+    Explorer points are not project points: they have no point id and are
+    identified by their protocol `addr` (i.e.: "ai.1").
+    """
+    name: str
+    addr: str
+    type: Optional[str] = None
+    unit: Optional[str] = None
+    enum: Optional[str] = None
+    desc: Optional[str] = None
+    sample: Any = None
+
+    @classmethod
+    def _from_dict(cls, d):
+        return cls(
+            name=d["name"],
+            addr=d["addr"],
+            type=d.get("type"),
+            unit=d.get("unit"),
+            enum=d.get("enum"),
+            desc=d.get("desc"),
+            sample=d.get("sample"),
+        )
+
+@dataclass
+class ExplorerPointList:
+    """Response from the explorer points endpoint.
+
+    The point list reflects the source's last learn, so it is empty until
+    `source.last_learn` is set.
+    """
+    points: list[ExplorerPoint]
+    source: Optional[ExplorerSource] = None
+
+    def __iter__(self):
+        return iter(self.points)
+
+    def __getitem__(self, i):
+        return self.points[i]
+
+    def __len__(self):
+        return len(self.points)
+
+    def point(self, addr):
+        """Lookup a point by protocol address.
+
+        Args:
+            addr: point address string (i.e.: "ai.1")
+
+        Returns:
+            ExplorerPoint or None if not found
+        """
+        for p in self.points:
+            if p.addr == addr:
+                return p
+        return None
+
+    @classmethod
+    def _from_dict(cls, d):
+        source = d.get("source")
+        return cls(
+            points=[ExplorerPoint._from_dict(p) for p in d["points"]],
+            source=ExplorerSource._from_dict(source) if source else None,
+        )
