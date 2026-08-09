@@ -1,6 +1,8 @@
 # Changelog
 
-## Version 0.5 (working)
+## Version 0.6 (working)
+
+## Version 0.5 (9-Aug-2026)
 * Add explorer API: `explorer_scan`, `explorer_learn`, `explorer_ops`,
   `explorer_sources`, and `explorer_points`
 
