@@ -25,7 +25,7 @@ classifiers = [
 
 [project.urls]
 Homepage = "https://novant.io"
-Documentation = "https://docs.novant.io/api"
+Documentation = "https://docs.novant.io/sdk/python"
 Repository = "https://github.com/novant-io/novant-python"
 
 [project.optional-dependencies]
