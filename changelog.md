@@ -1,6 +1,8 @@
 # Changelog
 
-## Version 0.6 (working)
+## Version 0.7 (working)
+
+## Version 0.6 (25-Sep-2026)
 * Add `proj_id` to all project endpoint responses
 * Add `area` and `max_trend_years` to `Project`
 * Add support for org keys (`ak_org_xxx`): `NovantClient(proj_id=...)`
