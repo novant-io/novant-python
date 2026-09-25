@@ -17,7 +17,12 @@ class NovantErr(Exception):
         self.code = code
         self.body = body
         if body and isinstance(body, dict):
-            self.message = body.get("message", body.get("error", str(body)))
+            self.message = (
+                body.get("msg")
+                or body.get("message")
+                or body.get("error")
+                or str(body)
+            )
         else:
             self.message = f"HTTP {code}"
         super().__init__(self.message)

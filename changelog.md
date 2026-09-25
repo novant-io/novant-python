@@ -6,6 +6,8 @@
 * Add support for org keys (`ak_org_xxx`): `NovantClient(proj_id=...)`
   sets a default project, and all project methods accept `proj_id` to
   override it
+* Add `org_projects` to list all projects in an organization
+* Fix `NovantErr.message` to use the API error `msg`
 
 ## Version 0.5 (9-Aug-2026)
 * Add explorer API: `explorer_scan`, `explorer_learn`, `explorer_ops`,

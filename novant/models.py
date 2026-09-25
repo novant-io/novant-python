@@ -78,6 +78,63 @@ class Project:
         )
 
 #############################################################################
+# OrgProject / OrgProjectList
+#############################################################################
+
+@dataclass
+class OrgProject:
+    """Project summary from the org projects endpoint."""
+    proj_id: int
+    proj_name: str
+    city: str
+    tz: str
+    area: Optional[int] = None
+
+    @classmethod
+    def _from_dict(cls, d):
+        return cls(
+            proj_id=d["proj_id"],
+            proj_name=d["proj_name"],
+            city=d["city"],
+            tz=d["tz"],
+            area=d.get("area"),
+        )
+
+@dataclass
+class OrgProjectList:
+    """Response from the org projects endpoint."""
+    projects: list[OrgProject]
+
+    def __iter__(self):
+        return iter(self.projects)
+
+    def __getitem__(self, i):
+        return self.projects[i]
+
+    def __len__(self):
+        return len(self.projects)
+
+    def project(self, proj_id):
+        """Lookup a project by id.
+
+        Args:
+            proj_id: project id int
+
+        Returns:
+            OrgProject or None if not found
+        """
+        for p in self.projects:
+            if p.proj_id == proj_id:
+                return p
+        return None
+
+    @classmethod
+    def _from_dict(cls, d):
+        return cls(
+            projects=[OrgProject._from_dict(p) for p in d["projects"]],
+        )
+
+#############################################################################
 # Asset
 #############################################################################
 

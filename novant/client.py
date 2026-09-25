@@ -20,6 +20,7 @@ from .models import (
     ExplorerOpList,
     ExplorerPointList,
     ExplorerSourceList,
+    OrgProjectList,
     PointList,
     Project,
     SceneList,
@@ -56,6 +57,21 @@ class NovantClient:
         self.base_url = "https://api.novant.io/v1"
         self.timeout = timeout
         self.proj_id = proj_id
+
+    ######
+    # Org
+    ######
+
+    def org_projects(self):
+        """List all projects in the organization.
+
+        Requires an org key ('ak_org_xxx'); project keys fail with 403. Use
+        the returned proj_id values to target project requests.
+
+        Returns:
+            OrgProjectList
+        """
+        return OrgProjectList._from_dict(self._get("/org/projects"))
 
     ######
     # Project

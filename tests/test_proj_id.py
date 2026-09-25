@@ -80,7 +80,7 @@ def _stub(client, captured):
 def test_all_project_methods_covered():
     public = {
         n for n in dir(NovantClient)
-        if not n.startswith("_") and callable(getattr(NovantClient, n))
+        if not n.startswith(("_", "org_")) and callable(getattr(NovantClient, n))
     }
     assert public == {name for name, _ in CALLS}
 

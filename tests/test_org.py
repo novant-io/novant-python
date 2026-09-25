@@ -9,13 +9,14 @@
 import pytest
 
 from novant import NovantClient, NovantErr
-from novant.models import Project, ZoneList
+from novant.models import OrgProject, OrgProjectList, Project, ZoneList
 
 
 def test_org_key_requires_proj_id(org_client):
     with pytest.raises(NovantErr) as e:
         org_client.zones()
     assert e.value.code == 400
+    assert e.value.message == "Organization API keys require proj_id argument."
 
 
 def test_org_key_per_call_proj_id(org_client, proj_id):
@@ -47,3 +48,29 @@ def test_project_key_other_proj_id(client, proj_id):
     with pytest.raises(NovantErr) as e:
         client.zones(proj_id=proj_id + 1)
     assert e.value.code in (403, 404)
+
+
+def test_org_projects(org_client, proj_id):
+    res = org_client.org_projects()
+    assert isinstance(res, OrgProjectList)
+    assert len(res) > 0
+    for p in res:
+        assert isinstance(p, OrgProject)
+        assert isinstance(p.proj_id, int)
+        assert isinstance(p.proj_name, str)
+        assert isinstance(p.city, str)
+        assert isinstance(p.tz, str)
+        assert p.area is None or isinstance(p.area, int)
+    assert res.project(proj_id) is not None
+
+
+def test_org_projects_ids_usable_for_project_requests(org_client):
+    for p in org_client.org_projects():
+        assert org_client.project(proj_id=p.proj_id).proj_id == p.proj_id
+
+
+def test_org_projects_rejects_project_key(client):
+    with pytest.raises(NovantErr) as e:
+        client.org_projects()
+    assert e.value.code == 403
+    assert e.value.message == "This endpoint requires an organization API key."
