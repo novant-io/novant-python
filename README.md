@@ -35,6 +35,34 @@ for row in client.trends(point_ids=["s.2.4", "s.2.5"], date="2026-03-09"):
     print(row.ts, row.values)
 ```
 
+## Organization Keys
+
+Project keys (`ak_xxx`) are bound to a single project. Organization keys
+(`ak_org_xxx`) can access any project in the organization, and must specify
+which project to act on with `proj_id`:
+
+```python
+client = NovantClient(api_key="ak_org_xxx")
+
+# List all projects in the organization
+for p in client.org_projects():
+    print(p.proj_id, p.proj_name)
+
+# Pass proj_id per call
+zones = client.zones(proj_id=4821)
+
+# Or set a default proj_id for all calls
+client = NovantClient(api_key="ak_org_xxx", proj_id=4821)
+zones = client.zones()
+```
+
+All responses from project endpoints include the `proj_id` they were
+served from:
+
+```python
+print(zones.proj_id)    # 4821
+```
+
 ## Development
 
 ```bash
@@ -59,3 +87,7 @@ pytest
 ```
 
 Tests are skipped automatically if `secret/test.key` is missing.
+
+Organization key tests additionally require an org key at
+`secret/test.org_key`, for an organization that contains the test project.
+These tests are skipped if the key is missing.
