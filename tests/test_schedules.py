@@ -16,6 +16,7 @@ from novant.models import (
 )
 
 SAMPLE = {
+    "proj_id": 4821,
     "schedules": [
         {
             "id": "sch.1",
@@ -66,7 +67,9 @@ def test_schedules_request_with_and_without_id():
 
 
 def test_schedule_fields_and_raw_string_preserved():
-    sched = _client().schedules().schedule("sch.1")
+    res = _client().schedules()
+    assert res.proj_id == 4821
+    sched = res.schedule("sch.1")
     assert isinstance(sched, Schedule)
     assert sched.name == "Business Hours"
     assert sched.schedule == "weekdays 8:00-17:00, sat 9:00-12:00"

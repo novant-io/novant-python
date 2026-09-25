@@ -31,3 +31,9 @@ def any_source_id(client):
     if len(sources) == 0:
         pytest.skip("test project has no sources")
     return next(iter(sources)).id
+
+
+@pytest.fixture(scope="session")
+def proj_id(client):
+    """The proj_id of the test project; every project endpoint echoes it."""
+    return client.project().proj_id

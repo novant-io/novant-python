@@ -15,7 +15,7 @@ def _stub_get(client, captured):
     def fake(path, params=None):
         captured["path"] = path
         captured["params"] = params
-        return {"values": []}
+        return {"proj_id": 4821, "values": []}
     client._get = fake
 
 
@@ -34,12 +34,14 @@ def test_values_index_and_slice_access():
     captured = {}
     _stub_get(client, captured)
     client._get = lambda path, params=None: {
+        "proj_id": 4821,
         "values": [
             {"id": "s.2.4", "val": 72.5, "status": "ok"},
             {"id": "s.2.5", "val": 68.0, "status": "ok"},
         ]
     }
     res = client.values(source_id="s.2")
+    assert res.proj_id == 4821
     assert res[0].id == "s.2.4"
     assert res[1].val == 68.0
     assert [v.id for v in res[0:2]] == ["s.2.4", "s.2.5"]

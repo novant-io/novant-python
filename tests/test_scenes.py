@@ -10,6 +10,7 @@ from novant import NovantClient
 from novant.models import Scene, SceneList, SceneMode
 
 SAMPLE = {
+    "proj_id": 4821,
     "scenes": [
         {
             "id": "sn.5",
@@ -63,6 +64,7 @@ def test_scenes_parsing():
     captured = {}
     _stub_get(client, captured, SAMPLE)
     res = client.scenes()
+    assert res.proj_id == 4821
     assert len(res) == 1
     scene = res.scene("sn.5")
     assert isinstance(scene, Scene)

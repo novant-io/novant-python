@@ -17,6 +17,7 @@ from novant.models import (
 )
 
 OPS = {
+    "proj_id": 4821,
     "ops": [
         {
             "id": "0a1b2c3d4e5f6a7b",
@@ -54,6 +55,7 @@ OPS = {
 }
 
 SOURCES = {
+    "proj_id": 4821,
     "sources": [
         {
             "id": "c1578fe370e4",
@@ -91,6 +93,7 @@ SOURCES = {
 }
 
 POINTS = {
+    "proj_id": 4821,
     "source": {
         "id": "23a769452950",
         "name": "ECB-600-1",
@@ -286,6 +289,7 @@ def test_explorer_ops_parsing():
     captured = {}
     _stub_get(client, captured, OPS)
     res = client.explorer_ops()
+    assert res.proj_id == 4821
     assert len(res) == 4
     op = res.op("2c3d4e5f6a7b8c9d")
     assert isinstance(op, ExplorerOp)
@@ -356,7 +360,7 @@ def test_explorer_ops_lookup_miss_returns_none():
 def test_explorer_ops_empty():
     client = NovantClient(api_key="x")
     captured = {}
-    _stub_get(client, captured, {"ops": []})
+    _stub_get(client, captured, {"proj_id": 4821, "ops": []})
     res = client.explorer_ops()
     assert len(res) == 0
     assert res.op("0a1b2c3d4e5f6a7b") is None
@@ -381,6 +385,7 @@ def test_explorer_sources_parsing():
     captured = {}
     _stub_get(client, captured, SOURCES)
     res = client.explorer_sources()
+    assert res.proj_id == 4821
     assert len(res) == 2
     s = res.source("c1578fe370e4")
     assert isinstance(s, ExplorerSource)
@@ -404,6 +409,7 @@ def test_explorer_sources_missing_metadata_defaults_to_none():
     client = NovantClient(api_key="x")
     captured = {}
     _stub_get(client, captured, {
+        "proj_id": 4821,
         "sources": [{"id": "abc123", "name": "Dev", "type": "bacnet"}]
     })
     s = client.explorer_sources().source("abc123")
@@ -450,6 +456,7 @@ def test_explorer_points_parsing():
     captured = {}
     _stub_get(client, captured, POINTS)
     res = client.explorer_points(source_id="23a769452950")
+    assert res.proj_id == 4821
     assert len(res) == 3
     p = res.point("ai.1")
     assert isinstance(p, ExplorerPoint)
@@ -495,6 +502,7 @@ def test_explorer_points_empty_until_learned():
     client = NovantClient(api_key="x")
     captured = {}
     _stub_get(client, captured, {
+        "proj_id": 4821,
         "source": {
             "id": "23a769452950",
             "name": "ECB-600-1",

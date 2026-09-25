@@ -57,20 +57,24 @@ class Project:
     """Project metadata."""
     proj_id: int
     proj_name: str
+    area: int
     city: str
     tz: str
     usage: int
     capacity: int
+    max_trend_years: int
 
     @classmethod
     def _from_dict(cls, d):
         return cls(
             proj_id=d["proj_id"],
             proj_name=d["proj_name"],
+            area=d["area"],
             city=d["city"],
             tz=d["tz"],
             usage=d["usage"],
             capacity=d["capacity"],
+            max_trend_years=d["max_trend_years"],
         )
 
 #############################################################################
@@ -101,6 +105,7 @@ class Asset:
 @dataclass
 class AssetList:
     """Response from the assets endpoint."""
+    proj_id: int
     currency: str
     assets: list[Asset]
 
@@ -130,6 +135,7 @@ class AssetList:
     @classmethod
     def _from_dict(cls, d):
         return cls(
+            proj_id=d["proj_id"],
             currency=d["currency"],
             assets=[Asset._from_dict(a) for a in d["assets"]],
         )
@@ -166,6 +172,7 @@ class Space:
 @dataclass
 class SpaceList:
     """Response from the spaces endpoint."""
+    proj_id: int
     spaces: list[Space]
 
     def __iter__(self):
@@ -194,6 +201,7 @@ class SpaceList:
     @classmethod
     def _from_dict(cls, d):
         return cls(
+            proj_id=d["proj_id"],
             spaces=[Space._from_dict(s) for s in d["spaces"]],
         )
 
@@ -225,6 +233,7 @@ class Zone:
 @dataclass
 class ZoneList:
     """Response from the zones endpoint."""
+    proj_id: int
     zones: list[Zone]
 
     def __iter__(self):
@@ -253,6 +262,7 @@ class ZoneList:
     @classmethod
     def _from_dict(cls, d):
         return cls(
+            proj_id=d["proj_id"],
             zones=[Zone._from_dict(z) for z in d["zones"]],
         )
 
@@ -292,6 +302,7 @@ class Source:
 @dataclass
 class SourceList:
     """Response from the sources endpoint."""
+    proj_id: int
     sources: list[Source]
 
     def __iter__(self):
@@ -320,6 +331,7 @@ class SourceList:
     @classmethod
     def _from_dict(cls, d):
         return cls(
+            proj_id=d["proj_id"],
             sources=[Source._from_dict(s) for s in d["sources"]],
         )
 
@@ -372,6 +384,7 @@ class PointList:
     The parent metadata fields populated depend on which parent was used
     in the request: source_id, asset_id, or space_id.
     """
+    proj_id: int
     points: list[Point]
     source_id: Optional[str] = None
     source_name: Optional[str] = None
@@ -409,6 +422,7 @@ class PointList:
     @classmethod
     def _from_dict(cls, d):
         return cls(
+            proj_id=d["proj_id"],
             points=[Point._from_dict(p) for p in d["points"]],
             source_id=d.get("source_id"),
             source_name=d.get("source_name"),
@@ -443,6 +457,7 @@ class ValueList:
     The parent metadata fields populated depend on which parent was used
     in the request: source_id, asset_id, or space_id.
     """
+    proj_id: int
     values: list[PointValue]
     source_id: Optional[str] = None
     asset_id: Optional[str] = None
@@ -495,6 +510,7 @@ class ValueList:
     @classmethod
     def _from_dict(cls, d):
         return cls(
+            proj_id=d["proj_id"],
             values=[PointValue._from_dict(v) for v in d["values"]],
             source_id=d.get("source_id"),
             asset_id=d.get("asset_id"),
@@ -521,6 +537,7 @@ class TrendRow:
 @dataclass
 class TrendData:
     """Response from the trends endpoint."""
+    proj_id: int
     start: str
     end: str
     tz: str
@@ -563,6 +580,7 @@ class TrendData:
     @classmethod
     def _from_dict(cls, d):
         return cls(
+            proj_id=d["proj_id"],
             start=d["start"],
             end=d["end"],
             tz=d["tz"],
@@ -646,6 +664,7 @@ class Scene:
 @dataclass
 class SceneList:
     """Response from the scenes endpoint."""
+    proj_id: int
     scenes: list[Scene]
 
     def __iter__(self):
@@ -687,7 +706,10 @@ class SceneList:
 
     @classmethod
     def _from_dict(cls, d):
-        return cls(scenes=[Scene._from_dict(s) for s in d["scenes"]])
+        return cls(
+            proj_id=d["proj_id"],
+            scenes=[Scene._from_dict(s) for s in d["scenes"]],
+        )
 
 #############################################################################
 # ScheduleRule / Schedule / ScheduleList
@@ -838,6 +860,7 @@ class Schedule:
 @dataclass
 class ScheduleList:
     """Response from the schedules endpoint."""
+    proj_id: int
     schedules: list[Schedule]
 
     def __iter__(self):
@@ -865,7 +888,10 @@ class ScheduleList:
 
     @classmethod
     def _from_dict(cls, d):
-        return cls(schedules=[Schedule._from_dict(s) for s in d["schedules"]])
+        return cls(
+            proj_id=d["proj_id"],
+            schedules=[Schedule._from_dict(s) for s in d["schedules"]],
+        )
 
 #############################################################################
 # ExplorerOp / ExplorerOpList
@@ -926,6 +952,7 @@ class ExplorerOpList:
     those completed in the last 24 hours. An op_id that no longer appears
     completed more than 24 hours ago; it is not an error.
     """
+    proj_id: int
     ops: list[ExplorerOp]
 
     def __iter__(self):
@@ -953,7 +980,10 @@ class ExplorerOpList:
 
     @classmethod
     def _from_dict(cls, d):
-        return cls(ops=[ExplorerOp._from_dict(o) for o in d["ops"]])
+        return cls(
+            proj_id=d["proj_id"],
+            ops=[ExplorerOp._from_dict(o) for o in d["ops"]],
+        )
 
 #############################################################################
 # ExplorerSource / ExplorerSourceList
@@ -1010,6 +1040,7 @@ class ExplorerSourceList:
     Sources accumulate across scans, so compare `last_scan` to identify
     what the most recent scan found.
     """
+    proj_id: int
     sources: list[ExplorerSource]
 
     def __iter__(self):
@@ -1038,6 +1069,7 @@ class ExplorerSourceList:
     @classmethod
     def _from_dict(cls, d):
         return cls(
+            proj_id=d["proj_id"],
             sources=[ExplorerSource._from_dict(s) for s in d["sources"]],
         )
 
@@ -1079,6 +1111,7 @@ class ExplorerPointList:
     The point list reflects the source's last learn, so it is empty until
     `source.last_learn` is set.
     """
+    proj_id: int
     points: list[ExplorerPoint]
     source: Optional[ExplorerSource] = None
 
@@ -1109,6 +1142,7 @@ class ExplorerPointList:
     def _from_dict(cls, d):
         source = d.get("source")
         return cls(
+            proj_id=d["proj_id"],
             points=[ExplorerPoint._from_dict(p) for p in d["points"]],
             source=ExplorerSource._from_dict(source) if source else None,
         )

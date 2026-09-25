@@ -1,6 +1,8 @@
 # Changelog
 
 ## Version 0.6 (working)
+* Add `proj_id` to all project endpoint responses
+* Add `area` and `max_trend_years` to `Project`
 
 ## Version 0.5 (9-Aug-2026)
 * Add explorer API: `explorer_scan`, `explorer_learn`, `explorer_ops`,
