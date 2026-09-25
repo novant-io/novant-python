@@ -281,7 +281,7 @@ def test_explorer_ops_request():
     res = client.explorer_ops()
     assert isinstance(res, ExplorerOpList)
     assert captured["path"] == "/explorer/ops"
-    assert captured["params"] is None
+    assert captured["params"] == {}
 
 
 def test_explorer_ops_parsing():
@@ -377,7 +377,7 @@ def test_explorer_sources_request():
     res = client.explorer_sources()
     assert isinstance(res, ExplorerSourceList)
     assert captured["path"] == "/explorer/sources"
-    assert captured["params"] is None
+    assert captured["params"] == {}
 
 
 def test_explorer_sources_parsing():

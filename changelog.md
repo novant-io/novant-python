@@ -3,6 +3,9 @@
 ## Version 0.6 (working)
 * Add `proj_id` to all project endpoint responses
 * Add `area` and `max_trend_years` to `Project`
+* Add support for org keys (`ak_org_xxx`): `NovantClient(proj_id=...)`
+  sets a default project, and all project methods accept `proj_id` to
+  override it
 
 ## Version 0.5 (9-Aug-2026)
 * Add explorer API: `explorer_scan`, `explorer_learn`, `explorer_ops`,

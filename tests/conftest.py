@@ -37,3 +37,17 @@ def any_source_id(client):
 def proj_id(client):
     """The proj_id of the test project; every project endpoint echoes it."""
     return client.project().proj_id
+
+
+ORG_KEY_PATH = os.path.join(
+    os.path.dirname(__file__), "..", "secret", "test.org_key"
+)
+
+
+@pytest.fixture(scope="session")
+def org_client():
+    if not os.path.exists(ORG_KEY_PATH):
+        pytest.skip(f"test org API key not found at {ORG_KEY_PATH}")
+    with open(ORG_KEY_PATH) as f:
+        api_key = f.read().strip()
+    return NovantClient(api_key=api_key)
