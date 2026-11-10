@@ -604,6 +604,28 @@ class NovantClient:
         params = self._proj_params(proj_id)
         return self._post_csv("/import/source-map", csv_data, params)
 
+    def import_scene(self, csv_data, proj_id=None):
+        """Import a scene from CSV data.
+
+        Like source maps, the CSV describes a single scene: the first data
+        row is the scene itself, and each following row is a point in that
+        scene, with one column per mode. Leave the scene id blank to create
+        a new scene.
+
+        Requires a Control API key: a scene used by a schedule writes its
+        values to equipment, so changing those values is a write to the
+        building.
+
+        Args:
+            csv_data: CSV string content
+            proj_id: project id; required for org keys unless set on the client
+
+        Returns:
+            dict with status
+        """
+        params = self._proj_params(proj_id)
+        return self._post_csv("/import/scene", csv_data, params)
+
     def import_trends(self, csv_data, mode=None, proj_id=None):
         """Import trend data from CSV data.
 
