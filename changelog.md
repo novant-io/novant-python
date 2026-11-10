@@ -3,6 +3,8 @@
 ## Version 0.7 (working)
 * Add `import_scene` to add or update a scene from CSV (requires a Control
   API key)
+* Add `import_schedules` to add or update schedules from CSV (requires a
+  Control API key)
 
 ## Version 0.6 (25-Sep-2026)
 * Add `proj_id` to all project endpoint responses

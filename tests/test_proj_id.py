@@ -58,6 +58,7 @@ CALLS = [
     ("import_sources",    lambda c, **kw: c.import_sources("id\n", **kw)),
     ("import_source_map", lambda c, **kw: c.import_source_map("id\n", **kw)),
     ("import_scene",      lambda c, **kw: c.import_scene("name\n", **kw)),
+    ("import_schedules",  lambda c, **kw: c.import_schedules("id\n", **kw)),
     ("import_trends",     lambda c, **kw: c.import_trends("ts\n", **kw)),
 ]
 

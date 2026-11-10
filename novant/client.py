@@ -626,6 +626,26 @@ class NovantClient:
         params = self._proj_params(proj_id)
         return self._post_csv("/import/scene", csv_data, params)
 
+    def import_schedules(self, csv_data, proj_id=None):
+        """Import schedules from CSV data.
+
+        Each row adds or updates a schedule. Rows without an id add a new
+        schedule; rows with one update it, and only the columns present
+        are changed.
+
+        Requires a Control API key: a schedule applies its scene modes to
+        equipment, so changing a schedule is a write to the building.
+
+        Args:
+            csv_data: CSV string content
+            proj_id: project id; required for org keys unless set on the client
+
+        Returns:
+            dict with status
+        """
+        params = self._proj_params(proj_id)
+        return self._post_csv("/import/schedules", csv_data, params)
+
     def import_trends(self, csv_data, mode=None, proj_id=None):
         """Import trend data from CSV data.
 
