@@ -1,6 +1,8 @@
 # Changelog
 
-## Version 0.7 (working)
+## Version 0.8 (working)
+
+## Version 0.7 (10-Nov-2026)
 * Add `import_scene` to add or update a scene from CSV (requires a Control
   API key)
 * Add `import_schedules` to add or update schedules from CSV (requires a
